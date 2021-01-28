@@ -33,7 +33,7 @@ def main():
     misp_attrs = len(combined_misp_msgraph_dicts)
     logging.info(
         "(%s, %s, %s, %s, %s, %s) - "
-        '(MISP attrs, as MSGraph IOC, pushed to MSGraph, Ignored, ignored defender, corrupt/unknown)',
+        '(MISP attrs, as MSGraph IOC, pushed to MSGraph, ignored, ignored defender, corrupt/unknown)',
         misp_attrs,
         transform_counters['SUCCESS'],
         push_to_msgraph,

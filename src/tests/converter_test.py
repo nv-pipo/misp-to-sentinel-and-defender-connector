@@ -398,3 +398,38 @@ def test_converter_email_subject():
     )
 
     assert misp_iocs_as_sentinel[0].pattern == expected_sentinel_ioc.pattern
+
+
+def test_converter_mutex():
+    misp_ioc = json.loads(
+        """
+        {
+            "timestamp": "1666296048",
+            "type": "mutex",
+            "value": "vBQA5vjd0gKHLwQyJK86NhVS",
+            "id": "-",
+            "event_id": "-",
+            "category": "-",
+            "uuid": "-",
+            "Event": {
+                "info": "-"
+            }
+        }
+        """
+    )
+    misp_iocs_as_sentinel = converter.transform_iocs_misp_to_sentinel([misp_ioc], 2, "-")
+
+    expected_sentinel_ioc = converter.SentinelIOC(
+        description="-",
+        displayName="-",
+        externalId="-",
+        pattern="[mutex:name = 'vBQA5vjd0gKHLwQyJK86NhVS']",
+        patternType="-",
+        source="-",
+        threatIntelligenceTags=[],
+        threatTypes=[],
+        validFrom="-",
+        validUntil="-",
+    )
+
+    assert misp_iocs_as_sentinel[0].pattern == expected_sentinel_ioc.pattern

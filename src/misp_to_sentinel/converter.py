@@ -90,6 +90,7 @@ TYPE_MAPPINGS = {
     "domain": "domain-name:value",
     "filename": "file:name",
     "url": "url:value",
+    "mutex": "mutex:name",
 }
 
 SUPPORTED_TYPES = list(TYPE_MAPPINGS.keys())

@@ -12,7 +12,7 @@ from misp_to_sentinel.config import (
     AZ_SENTINEL_WORKSPACE_NAME,
     AZ_SUBSCRIPTION,
     AZ_TENANT_ID,
-    RECENT_NUM_DAYS,
+    RECENT_NUM_DAYS_SENTINEL,
 )
 from misp_to_sentinel.converter import SentinelIOC
 
@@ -37,7 +37,7 @@ def __get_misp_ids_of_recent_ioc_in_sentinel(ma_client: httpx.Client) -> list[st
         "pageSize": 100000,
         "minValidUntil": (
             datetime.now(timezone.utc)
-            + timedelta(days=-RECENT_NUM_DAYS)
+            + timedelta(days=-RECENT_NUM_DAYS_SENTINEL)
             + timedelta(days=AZ_DAYS_TO_EXPIRE)
         ).isoformat(),
     }
@@ -58,7 +58,7 @@ def __get_misp_ids_of_recent_ioc_in_sentinel(ma_client: httpx.Client) -> list[st
     logger.info(
         "Retrieved %s IOCs from sentinel (last %s days)",
         len(misp_ids_of_recent_ioc_in_sentinel),
-        RECENT_NUM_DAYS,
+        RECENT_NUM_DAYS_SENTINEL,
     )
 
     return misp_ids_of_recent_ioc_in_sentinel

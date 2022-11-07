@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Connector to MISP."""
 import logging
-from typing import Union
+from typing import Optional
 
 import httpx
 
@@ -12,13 +12,13 @@ from misp_to_sentinel.config import (
     MISP_EVENT_FILTERS,
     MISP_KEY,
     MISP_TIMEOUT,
-    RECENT_NUM_DAYS,
+    RECENT_NUM_DAYS_MISP,
 )
 
 logger = logging.getLogger("misp_to_sentinel")
 
 
-def get_iocs(ioc_types: Union[list[str], None] = None) -> dict[str, any]:
+def get_iocs(ioc_types: Optional[list[str]] = None) -> dict[str, any]:
     """Method to pull the attributes (IOCs) from MISP server."""
     if not (MISP_BASE_URL and MISP_EVENT_FILTERS and MISP_KEY and MISP_TIMEOUT):
         raise Exception("Environment variables for MISP not available")
@@ -42,7 +42,10 @@ def get_iocs(ioc_types: Union[list[str], None] = None) -> dict[str, any]:
 
     misp_iocs = response_json["response"]["Attribute"]
     logger.info(
-        "Retrieved %s IOCs from %s (last %s days)", len(misp_iocs), MISP_BASE_URL, RECENT_NUM_DAYS
+        "Retrieved %s IOCs from %s (last %s days)",
+        len(misp_iocs),
+        MISP_BASE_URL,
+        RECENT_NUM_DAYS_MISP,
     )
 
     return response_json["response"]["Attribute"]

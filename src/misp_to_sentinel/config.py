@@ -1,7 +1,8 @@
 """Config variables script."""
 from os import environ
 
-RECENT_NUM_DAYS = 5
+RECENT_NUM_DAYS_MISP = 5
+RECENT_NUM_DAYS_SENTINEL = 10  # recommended that Sentinel range is longer than MISP
 
 # MISP
 MISP_LABEL = environ.get("ISAS_MISP_TAG_BASE")
@@ -9,7 +10,7 @@ MISP_BASE_URL = environ.get("ISAS_MISP_BASE_URL")
 MISP_KEY = environ.get("ISAS_MISP_KEY")
 MISP_CA_BUNDLE = environ.get("ISAS_MISP_CA_BUNDLE")
 MISP_EVENT_FILTERS = {
-    "timestamp": f"{RECENT_NUM_DAYS}d",
+    "timestamp": f"{RECENT_NUM_DAYS_MISP}d",
     "published": True,
     # "limit": 1,
 }

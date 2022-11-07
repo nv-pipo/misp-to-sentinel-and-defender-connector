@@ -8,6 +8,8 @@ from os import environ
 
 import httpx
 
+from misp_to_sentinel.config import AZ_TIMEOUT
+
 logger = logging.getLogger("misp_to_sentinel")
 
 
@@ -29,7 +31,7 @@ def generate_httpx_client(
         proxy = httpx.Proxy(proxy_url)
 
     transport = httpx.HTTPTransport(proxy=proxy, retries=3)
-    with httpx.Client(transport=transport) as client:
+    with httpx.Client(transport=transport, timeout=AZ_TIMEOUT) as client:
         auth_request = client.post(
             f"https://login.microsoftonline.com/{tenant_id}/oauth2/token",
             data=data,
@@ -38,5 +40,5 @@ def generate_httpx_client(
 
     # Create client
     headers = {"Authorization": f"Bearer {access_token}", "user-agent": "ILO_MISP/2.0"}
-    client = httpx.Client(transport=transport, headers=headers)
+    client = httpx.Client(transport=transport, timeout=AZ_TIMEOUT, headers=headers)
     return client

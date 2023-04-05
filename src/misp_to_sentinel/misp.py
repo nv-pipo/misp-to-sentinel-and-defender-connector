@@ -12,8 +12,6 @@ from tenacity.wait import wait_fixed
 
 from misp_to_sentinel.utils.timing import timefunc_async
 
-logger = logging.getLogger("misp_to_sentinel")
-
 RE_EXTRACT_ID = re.compile(r"indicator--(?P<id>.*)$")
 
 
@@ -67,7 +65,7 @@ class MISPConnector:
         )
 
         if response.status_code != 200:
-            logger.error(
+            logging.error(
                 "Error while requesting %s %s: %s",
                 method,
                 path,
@@ -125,7 +123,7 @@ class MISPConnector:
             for attribute in response_details.json()["response"]["Attribute"]
             if attribute["uuid"] in stix_partterns_per_id
         ]
-        logger.info(
+        logging.info(
             "Retrieved %s IOCs from %s (for the last %s days)",
             len(misp_attributes),
             self.misp_base_url,

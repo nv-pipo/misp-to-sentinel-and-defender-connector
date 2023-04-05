@@ -1,7 +1,6 @@
 """MISP connector."""
 import asyncio
 import logging
-import re
 from typing import Optional
 
 import httpx
@@ -12,14 +11,14 @@ from tenacity.wait import wait_fixed
 
 from misp_to_sentinel.utils.timing import timefunc_async
 
-RE_EXTRACT_ID = re.compile(r"indicator--(?P<id>.*)$")
-
 
 @dataclass
 class MISPAttribute:
     """MISP attribute."""
 
+    stix_id: str
     attribute_id: str
+    timestamp: int
     pattern: str
     category: str
     event_id: str
@@ -52,15 +51,15 @@ class MISPConnector:
 
         self.misp_base_url = misp_base_url
         self.misp_label = misp_label
-        self.client_sync = httpx.Client(verify=ssl_verify, headers=headers)
         self.client_async = httpx.AsyncClient(verify=ssl_verify, headers=headers)
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     async def __request_async(self, method: str, path: str, **kwargs) -> httpx.Response:
-        logging.info("Requesting %s %s", method, path)
+        url = f"{self.misp_base_url}/{path}"
+        logging.info("Requesting %s %s", method, url)
         response = await self.client_async.request(
             method=method,
-            url=f"{self.misp_base_url}/{path}",
+            url=url,
             **kwargs,
         )
 
@@ -68,7 +67,7 @@ class MISPConnector:
             logging.error(
                 "Error while requesting %s %s: %s",
                 method,
-                path,
+                url,
                 response.content,
             )
             raise MISPConnectorRetrieveException()
@@ -107,21 +106,23 @@ class MISPConnector:
         response_details, response_stix = await asyncio.gather(*tasks)
 
         stix_partterns_per_id = {
-            match.group("id"): o["pattern"]
+            o["id"]: o["pattern"]
             for o in response_stix.json()["objects"]
-            if (match := RE_EXTRACT_ID.match(o["id"]))
+            if o["id"].startswith("indicator--")
         }
 
         misp_attributes = [
             MISPAttribute(
+                stix_id=stix_id,
                 attribute_id=attribute["id"],
-                pattern=stix_partterns_per_id[attribute["uuid"]],
+                timestamp=attribute["timestamp"],
+                pattern=stix_partterns_per_id[stix_id],
                 category=attribute["category"],
                 event_id=attribute["Event"]["id"],
                 event_info=attribute["Event"]["info"],
             )
             for attribute in response_details.json()["response"]["Attribute"]
-            if attribute["uuid"] in stix_partterns_per_id
+            if (stix_id := f'indicator--{attribute["uuid"]}') in stix_partterns_per_id
         ]
         logging.info(
             "Retrieved %s IOCs from %s (for the last %s days)",

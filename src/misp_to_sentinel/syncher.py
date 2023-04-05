@@ -1,3 +1,4 @@
+"""Sync MISP to Sentinel."""
 import logging
 
 from misp_to_sentinel.misp import MISPConnector
@@ -5,6 +6,7 @@ from misp_to_sentinel.utils.environ_utils import load_env_variable
 
 
 async def sync():
+    """Sync MISP to Sentinel."""
     # Retrieve from MISP
     misp = MISPConnector(
         misp_base_url=load_env_variable("MISP_BASE_URL"),

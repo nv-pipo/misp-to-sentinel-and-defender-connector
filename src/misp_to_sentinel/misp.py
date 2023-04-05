@@ -21,7 +21,7 @@ RE_EXTRACT_ID = re.compile(r"indicator--(?P<id>.*)$")
 class MISPAttribute:
     """MISP attribute."""
 
-    id: str
+    attribute_id: str
     pattern: str
     category: str
     event_id: str
@@ -116,7 +116,7 @@ class MISPConnector:
 
         misp_attributes = [
             MISPAttribute(
-                id=attribute["id"],
+                attribute_id=attribute["id"],
                 pattern=stix_partterns_per_id[attribute["uuid"]],
                 category=attribute["category"],
                 event_id=attribute["Event"]["id"],

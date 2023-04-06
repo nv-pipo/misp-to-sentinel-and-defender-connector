@@ -73,7 +73,7 @@ class SentinelConnector:
         return await self.__request_async_no_retries(method, url, **kwargs)
 
     async def __request_async_no_retries(self, method: str, url: str, **kwargs) -> httpx.Response:
-        logging.info("Requesting %s %s", method, url)
+        logging.debug("Requesting %s %s", method, url)
         response = await self.client_async.request(
             method=method,
             url=url,

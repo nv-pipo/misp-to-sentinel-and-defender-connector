@@ -1,5 +1,5 @@
+"""Sentinel API class"""
 import logging
-from typing import Any
 
 import httpx
 from pydantic import BaseModel
@@ -11,6 +11,8 @@ from misp_to_sentinel.utils.timing import timefunc_async
 
 
 class SentinelIndicator(BaseModel):
+    """Sentinel indicator"""
+
     source: str
     externalId: str
     displayName: str
@@ -29,10 +31,12 @@ class SentinelIndicator(BaseModel):
 
 
 class SentinelConnectorRetrieveException(Exception):
-    pass
+    """Exception raised when Sentinel connector fails to retrieve data."""
 
 
 class SentinelConnector:
+    """Sentinel connector"""
+
     def __init__(
         self,
         tenant_id: str,
@@ -87,19 +91,20 @@ class SentinelConnector:
 
         return response
 
-    async def __retrieve_all_pages(self, method: str, url: str, **kwargs) -> list[Any]:
-        """Retrieve all pages of a request."""
-        response = await self.__request_async(method=method, url=url, **kwargs)
-        data = response.json()
-        if "nextLink" in data:
-            next_link = data["nextLink"]
-            data["value"] += await self.__retrieve_all_pages(
-                method=method, url=next_link, **kwargs
-            )
-        return data["value"]
+    # async def __retrieve_all_pages(self, method: str, url: str, **kwargs) -> list[Any]:
+    #     """Retrieve all pages of a request."""
+    #     response = await self.__request_async(method=method, url=url, **kwargs)
+    #     data = response.json()
+    #     if "nextLink" in data:
+    #         next_link = data["nextLink"]
+    #         data["value"] += await self.__retrieve_all_pages(
+    #             method=method, url=next_link, **kwargs
+    #         )
+    #     return data["value"]
 
     @timefunc_async
     async def get_indicators(self, min_valid_until: str) -> list[str]:
+        """Retrieve all indicators from Sentinel."""
 
         url = (
             f"https://management.azure.com/subscriptions/{self.subscription_id}"
@@ -114,7 +119,7 @@ class SentinelConnector:
             method="POST",
             url=url,
             json={
-                "pageSize": 1000000,
+                "pageSize": 1000000,  # Using pages is not working for some reason, so we just get all indicators in one go
                 "sources": ["MISP_ICC"],
                 "minValidUntil": min_valid_until,
             },
@@ -123,6 +128,7 @@ class SentinelConnector:
         return response.json()["value"]
 
     async def create_indicator(self, indicator: SentinelIndicator) -> None:
+        """Create an indicator in Sentinel."""
 
         url = (
             f"https://management.azure.com/subscriptions/{self.subscription_id}"

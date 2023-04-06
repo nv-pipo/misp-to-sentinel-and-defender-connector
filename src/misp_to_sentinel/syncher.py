@@ -53,6 +53,13 @@ async def __get_current_state(
     existing_iocs_sentinel_external_ids = {
         ioc["properties"]["externalId"] for ioc in existing_iocs_sentinel
     }
+    # For backwards compatibility, add "indicator--" to iocs not conforming to STIX2
+    additional_iocs_sentinel_external_ids = {
+        f"indicator--{uuid}"
+        for uuid in existing_iocs_sentinel_external_ids
+        if not uuid.startswith("indicator--")
+    }
+    existing_iocs_sentinel_external_ids.update(additional_iocs_sentinel_external_ids)
     return existing_iocs_sentinel_external_ids, available_misp
 
 

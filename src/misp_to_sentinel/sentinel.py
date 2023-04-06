@@ -140,5 +140,6 @@ class SentinelConnector:
                 "kind": "indicator",
                 "properties": indicator.dict() | {"createdByRef": "MISP_CONNECTOR"},
             },
+            timeout=10,
         )
         return response.json()

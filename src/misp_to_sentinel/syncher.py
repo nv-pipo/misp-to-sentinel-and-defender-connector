@@ -31,6 +31,7 @@ def __init_connectors() -> tuple[MISPConnector, SentinelConnector]:
 async def __get_current_state(
     misp_connector: MISPConnector, sentinel_connector: SentinelConnector
 ) -> tuple[set[str], list[MISPAttribute]]:
+    misp_label = load_env_variable("MISP_LABEL")
     look_back_days = int(load_env_variable("LOOK_BACK_DAYS"))
     sentinel_days_to_expire = int(load_env_variable("SENTINEL_DAYS_TO_EXPIRE"))
 
@@ -40,7 +41,9 @@ async def __get_current_state(
         + timedelta(days=sentinel_days_to_expire)
     )
     tasks = [
-        sentinel_connector.get_indicators(sentinel_min_valid_until_utc.isoformat() + "Z"),
+        sentinel_connector.get_indicators(
+            min_valid_until=sentinel_min_valid_until_utc.isoformat() + "Z", sources=[misp_label]
+        ),
         misp_connector.get_attributes_with_stix2_patterns(
             look_back_days=load_env_variable("LOOK_BACK_DAYS"),
         ),
@@ -106,4 +109,5 @@ async def sync():
 
     iocs_to_create = __compute_iocs_to_create(existing_iocs_sentinel_external_ids, available_misp)
 
-    _ = await __push_to_sentinel(sentinel_connector, iocs_to_create)
+    await sentinel_connector.create_indicator(iocs_to_create[0])
+    # _ = await __push_to_sentinel(sentinel_connector, iocs_to_create)

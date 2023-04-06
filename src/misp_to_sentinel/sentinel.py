@@ -103,7 +103,7 @@ class SentinelConnector:
     #     return data["value"]
 
     @timefunc_async
-    async def get_indicators(self, min_valid_until: str) -> list[str]:
+    async def get_indicators(self, min_valid_until: str, sources: list[str]) -> list[str]:
         """Retrieve all indicators from Sentinel."""
 
         url = (
@@ -120,7 +120,7 @@ class SentinelConnector:
             url=url,
             json={
                 "pageSize": 1000000,  # Using pages is not working for some reason, so we just get all indicators in one go
-                "sources": ["MISP_ICC"],
+                "sources": sources,
                 "minValidUntil": min_valid_until,
             },
             timeout=40,

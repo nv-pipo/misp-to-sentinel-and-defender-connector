@@ -142,4 +142,5 @@ class SentinelConnector:
             },
             timeout=10,
         )
+        logging.info("Created IOC %s in Sentinel", repr(indicator))
         return response.json()

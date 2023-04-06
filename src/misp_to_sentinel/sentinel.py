@@ -10,7 +10,7 @@ from tenacity.wait import wait_fixed
 from misp_to_sentinel.utils.timing import timefunc_async
 
 
-class Indicator(BaseModel):
+class SentinelIndicator(BaseModel):
     source: str
     externalId: str
     displayName: str
@@ -122,7 +122,7 @@ class SentinelConnector:
         )
         return response.json()["value"]
 
-    async def create_indicator(self, indicator: Indicator) -> None:
+    async def create_indicator(self, indicator: SentinelIndicator) -> None:
 
         url = (
             f"https://management.azure.com/subscriptions/{self.subscription_id}"

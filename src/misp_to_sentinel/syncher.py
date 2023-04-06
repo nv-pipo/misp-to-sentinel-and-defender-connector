@@ -109,5 +109,4 @@ async def sync():
 
     iocs_to_create = __compute_iocs_to_create(existing_iocs_sentinel_external_ids, available_misp)
 
-    await sentinel_connector.create_indicator(iocs_to_create[0])
-    # _ = await __push_to_sentinel(sentinel_connector, iocs_to_create)
+    _ = await __push_to_sentinel(sentinel_connector, iocs_to_create)

@@ -119,7 +119,8 @@ class SentinelConnector:
             method="POST",
             url=url,
             json={
-                "pageSize": 1000000,  # Using pages is not working for some reason, so we just get all indicators in one go
+                # FIX? MS BUG? Using pages doesn't work, so we just get all? indicators in one go
+                "pageSize": 100_000,
                 "sources": sources,
                 "minValidUntil": min_valid_until,
             },

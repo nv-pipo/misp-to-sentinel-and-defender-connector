@@ -89,9 +89,11 @@ async def __push_to_sentinel(
 ) -> list[dict]:
     tasks = [sentinel_connector.create_indicator(ioc) for ioc in iocs_to_create]
     responses = await asyncio.gather(*tasks)
+    logging.info("Created %d indicators in Sentinel.", len(responses))
     return responses
 
 
+@timefunc_async
 async def sync():
     """Sync MISP to Sentinel."""
     # Retrieve from MISP
@@ -104,6 +106,4 @@ async def sync():
 
     iocs_to_create = __compute_iocs_to_create(existing_iocs_sentinel_external_ids, available_misp)
 
-    creation_responses = await __push_to_sentinel(sentinel_connector, iocs_to_create)
-
-    logging.info(available_misp)
+    _ = await __push_to_sentinel(sentinel_connector, iocs_to_create)

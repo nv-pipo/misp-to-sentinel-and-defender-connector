@@ -1,5 +1,7 @@
 """Sentinel API class"""
 import logging
+import re
+from typing import Any
 
 import httpx
 from pydantic import BaseModel
@@ -92,16 +94,27 @@ class SentinelConnector:
 
         return response
 
-    # async def __retrieve_all_pages(self, method: str, url: str, **kwargs) -> list[Any]:
-    #     """Retrieve all pages of a request."""
-    #     response = await self.__request_async(method=method, url=url, **kwargs)
-    #     data = response.json()
-    #     if "nextLink" in data:
-    #         next_link = data["nextLink"]
-    #         data["value"] += await self.__retrieve_all_pages(
-    #             method=method, url=next_link, **kwargs
-    #         )
-    #     return data["value"]
+    async def __retrieve_all_pages(self, method: str, url: str, **kwargs) -> list[Any]:
+        """Retrieve all pages of a request."""
+        data = []
+        while True:
+            response = await self.__request_async(method=method, url=url, **kwargs)
+            data.extend(response.json()["value"])
+            if not (next_link := response.json().get("nextLink")):
+                break
+            if method == "POST":
+                params = re.findall("[&](.*)", next_link)
+                split_params = {
+                    match["key"]: match["value"]
+                    for param in params
+                    if (match := re.match(r"(?P<key>.*?)=(?P<value>.*)", param))
+                }
+                skip_token = split_params["$skipToken"]
+                kwargs["json"] = dict(skipToken=skip_token)
+            else:
+                url = next_link
+
+        return data
 
     @timefunc_async
     async def get_indicators(self, min_valid_until: str, sources: list[str]) -> list[str]:

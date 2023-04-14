@@ -49,7 +49,8 @@ class SentinelConnector:
 
         # Get bearer token
         resource = "https://management.azure.com/"
-        with httpx.Client() as client:
+        transport = httpx.HTTPTransport(retries=3)
+        with httpx.Client(timeout=5, transport=transport) as client:
             auth_request = client.post(
                 f"https://login.microsoftonline.com/{tenant_id}/oauth2/token",
                 data={

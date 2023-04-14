@@ -108,7 +108,8 @@ class SentinelConnector:
         """Retrieve all indicators from Sentinel."""
 
         url = (
-            f"https://management.azure.com/subscriptions/{self.subscription_id}"
+            f"https://management.azure.com"
+            f"/subscriptions/{self.subscription_id}"
             f"/resourceGroups/{self.resource_group_name}"
             f"/providers/Microsoft.OperationalInsights"
             f"/workspaces/{self.workspace_name}"

@@ -130,18 +130,16 @@ class SentinelConnector:
             "/threatIntelligence/main/queryIndicators?api-version=2023-02-01"
         )
         # Retrieve attributes from MISP as JSON and STIX2 to return all required data
-        response = await self.__request_async(
+        data = await self.__retrieve_all_pages(
             method="POST",
             url=url,
             json={
-                # FIX? MS BUG? Using pages doesn't work, so we just get all? indicators in one go
-                "pageSize": 100_000,
                 "sources": sources,
                 "minValidUntil": min_valid_until,
             },
             timeout=40,
         )
-        return response.json()["value"]
+        return data
 
     async def create_indicator(self, indicator: SentinelIndicator) -> None:
         """Create an indicator in Sentinel."""

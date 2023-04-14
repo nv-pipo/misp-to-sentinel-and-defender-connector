@@ -82,7 +82,8 @@ class SentinelConnector:
 
         if response.status_code != 200:
             logging.error(
-                "Error while requesting %s %s: %s",
+                "Error while requesting (%s) %s %s: %s",
+                response.status_code,
                 method,
                 url,
                 response.content,

@@ -139,6 +139,7 @@ class SentinelConnector:
             },
             timeout=40,
         )
+        logging.info("Retrieved %s indicators from Sentinel", len(data))
         return data
 
     async def create_indicator(self, indicator: SentinelIndicator) -> None:

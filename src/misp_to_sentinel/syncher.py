@@ -98,6 +98,7 @@ async def __push_to_sentinel(
     sentinel_connector: SentinelConnector, iocs_to_create: list[SentinelIndicator]
 ) -> list[dict]:
     tasks = [sentinel_connector.create_indicator(ioc) for ioc in iocs_to_create]
+    logging.info("Attempting to push %d indicators to Sentinel.", len(iocs_to_create))
     responses = await asyncio.gather(*tasks)
     logging.info("Created %d indicators in Sentinel.", len(responses))
     return responses

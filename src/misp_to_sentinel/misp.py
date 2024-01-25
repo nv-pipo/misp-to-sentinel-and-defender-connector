@@ -9,6 +9,7 @@ from tenacity import retry
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
+from misp_to_sentinel.utils.environ_utils import load_env_variable
 from misp_to_sentinel.utils.timing import timefunc_async
 
 
@@ -23,6 +24,7 @@ class MISPAttribute:
     category: str
     event_id: str
     event_info: str
+    tags: list[str]
 
 
 class MISPConnectorRetrieveException(Exception):
@@ -92,14 +94,14 @@ class MISPConnector:
             self.__request_async(
                 method="POST",
                 path="/attributes/restSearch",
-                json=data,
-                timeout=40,
+                json=data | {"includeEventTags": True},
+                timeout=120,
             ),
             self.__request_async(
                 method="POST",
                 path="/attributes/restSearch",
                 json=data | {"returnFormat": "stix2"},
-                timeout=40,
+                timeout=120,
             ),
         ]
 
@@ -111,6 +113,8 @@ class MISPConnector:
             if o["id"].startswith("indicator--")
         }
 
+        misp_label = load_env_variable("MISP_LABEL")
+
         misp_attributes = [
             MISPAttribute(
                 stix_id=stix_id,
@@ -120,6 +124,15 @@ class MISPConnector:
                 category=attribute["category"],
                 event_id=attribute["Event"]["id"],
                 event_info=attribute["Event"]["info"],
+                tags=[
+                    f"{misp_label}_{tag['name']}"
+                    for tag in attribute.get("Tag", [])
+                    if not tag.get("name", "").startswith("tlp:")
+                ]
+                + [
+                    f"{misp_label}_event_id_{attribute['Event']['id']}",
+                    f"{misp_label}_attribute_id_{attribute['id']}",
+                ],
             )
             for attribute in response_details.json()["response"]["Attribute"]
             if (stix_id := f'indicator--{attribute["uuid"]}') in stix_partterns_per_id

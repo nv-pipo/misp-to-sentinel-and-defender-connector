@@ -74,10 +74,7 @@ def __compute_iocs_to_create(
             externalId=attr.stix_id,
             displayName=f"{misp_label}_attribute_{attr.attribute_id}",
             description=f"({misp_label} event_id: {attr.event_id}) {attr.event_info}",
-            threatIntelligenceTags=[
-                f"{misp_label}_event_id_{attr.event_id}",
-                f"{misp_label}_attribute_id_{attr.attribute_id}",
-            ],
+            threatIntelligenceTags=attr.tags,
             validFrom=datetime.fromtimestamp(attr.timestamp, timezone.utc),
             validUntil=(
                 datetime.fromtimestamp(attr.timestamp, timezone.utc)

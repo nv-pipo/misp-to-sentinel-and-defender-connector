@@ -95,13 +95,13 @@ class MISPConnector:
                 method="POST",
                 path="/attributes/restSearch",
                 json=data | {"includeEventTags": True},
-                timeout=40,
+                timeout=120,
             ),
             self.__request_async(
                 method="POST",
                 path="/attributes/restSearch",
                 json=data | {"returnFormat": "stix2"},
-                timeout=40,
+                timeout=120,
             ),
         ]
 

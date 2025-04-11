@@ -1,4 +1,5 @@
 """Sentinel API class"""
+
 import logging
 import re
 from typing import Any
@@ -48,7 +49,6 @@ class SentinelConnector:
         resource_group_name: str,
         workspace_name: str,
     ) -> None:
-
         # Get bearer token
         resource = "https://management.azure.com/"
         transport = httpx.HTTPTransport(retries=3)

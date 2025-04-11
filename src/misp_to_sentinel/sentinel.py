@@ -12,6 +12,8 @@ from tenacity.wait import wait_fixed
 
 from misp_to_sentinel.utils.timing import timefunc_async
 
+logger = logging.getLogger(__name__)
+
 
 class SentinelIndicator(BaseModel):
     """Sentinel indicator"""
@@ -83,7 +85,7 @@ class SentinelConnector:
         )
 
         if response.status_code != 200:
-            logging.error(
+            logger.error(
                 "Error while requesting (%s) %s %s: %s",
                 response.status_code,
                 method,
@@ -139,7 +141,7 @@ class SentinelConnector:
             },
             timeout=40,
         )
-        logging.info("Retrieved %s indicators from Sentinel", len(data))
+        logger.info("Retrieved %s indicators from Sentinel", len(data))
         return data
 
     async def create_indicator(self, indicator: SentinelIndicator) -> None:
@@ -163,5 +165,5 @@ class SentinelConnector:
             },
             timeout=10,
         )
-        logging.info("Created IOC %s in Sentinel", repr(indicator))
+        logger.info("Created IOC %s in Sentinel", repr(indicator))
         return response.json()

@@ -1,32 +1,35 @@
 """Sentinel API class"""
+
 import logging
 import re
 from typing import Any
 
 import httpx
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
 from misp_to_sentinel.utils.timing import timefunc_async
 
+logger = logging.getLogger(__name__)
+
 
 class SentinelIndicator(BaseModel):
     """Sentinel indicator"""
 
     source: str
-    externalId: str
-    displayName: str
+    external_id: str = Field(alias="externalId")
+    display_name: str = Field(alias="displayName")
     description: str
-    threatIntelligenceTags: list[str]
-    validFrom: str
-    validUntil: str
+    threat_intelligence_tags: list[str] = Field(alias="threatIntelligenceTags")
+    valid_from: str = Field(alias="validFrom")
+    valid_until: str = Field(alias="validUntil")
     pattern: str
-    patternType: str
-    threatTypes: list[str]
+    pattern_type: str = Field(alias="patternType")
+    threat_types: list[str] = Field(alias="threatTypes")
 
-    def __init__(self, **data):
+    def __init__(self, **data) -> None:
         data["validFrom"] = data["validFrom"].strftime("%Y-%m-%dT%H:%M:%SZ")
         data["validUntil"] = data["validUntil"].strftime("%Y-%m-%dT%H:%M:%SZ")
         super().__init__(**data)
@@ -48,7 +51,6 @@ class SentinelConnector:
         resource_group_name: str,
         workspace_name: str,
     ) -> None:
-
         # Get bearer token
         resource = "https://management.azure.com/"
         transport = httpx.HTTPTransport(retries=3)
@@ -83,7 +85,7 @@ class SentinelConnector:
         )
 
         if response.status_code != 200:
-            logging.error(
+            logger.error(
                 "Error while requesting (%s) %s %s: %s",
                 response.status_code,
                 method,
@@ -139,7 +141,7 @@ class SentinelConnector:
             },
             timeout=40,
         )
-        logging.info("Retrieved %s indicators from Sentinel", len(data))
+        logger.info("Retrieved %s indicators from Sentinel", len(data))
         return data
 
     async def create_indicator(self, indicator: SentinelIndicator) -> None:
@@ -159,9 +161,10 @@ class SentinelConnector:
             url=url,
             json={
                 "kind": "indicator",
-                "properties": indicator.dict() | {"createdByRef": "MISP_CONNECTOR"},
+                "properties": indicator.model_dump(by_alias=True)
+                | {"createdByRef": "MISP_CONNECTOR"},
             },
             timeout=10,
         )
-        logging.info("Created IOC %s in Sentinel", repr(indicator))
+        logger.info("Created IOC %s in Sentinel", repr(indicator))
         return response.json()

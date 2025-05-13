@@ -1,0 +1,7 @@
+ca_bundle.pem
+__pycache__
+.env
+src/misp_to_sentinel/manual/
+.DS_Store
+sync_ms_announcements.lock
+logs/sync_ms_announcements_*.log

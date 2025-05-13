@@ -12,6 +12,8 @@ from misp_to_sentinel.sentinel import SentinelConnector, SentinelIndicator
 from misp_to_sentinel.utils.environ_utils import load_env_variable
 from misp_to_sentinel.utils.timing import timefunc_async
 
+logger = logging.getLogger(__name__)
+
 
 def __init_connectors() -> tuple[MISPConnector, SentinelConnector]:
     misp_connector = MISPConnector(
@@ -99,9 +101,9 @@ async def __push_to_sentinel(
     sentinel_connector: SentinelConnector, iocs_to_create: list[SentinelIndicator]
 ) -> list[dict]:
     tasks = [sentinel_connector.create_indicator(ioc) for ioc in iocs_to_create]
-    logging.info("Attempting to push %d indicators to Sentinel.", len(iocs_to_create))
+    logger.info("Attempting to push %d indicators to Sentinel.", len(iocs_to_create))
     responses = await asyncio.gather(*tasks)
-    logging.info("Created %d indicators in Sentinel.", len(responses))
+    logger.info("Created %d indicators in Sentinel.", len(responses))
     return responses
 
 

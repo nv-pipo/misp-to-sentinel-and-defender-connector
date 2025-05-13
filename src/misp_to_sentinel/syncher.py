@@ -99,6 +99,10 @@ def __compute_iocs_to_create(
 async def __push_to_sentinel(
     sentinel_connector: SentinelConnector, iocs_to_create: list[SentinelIndicator]
 ) -> None:
+    if len(iocs_to_create) == 0:
+        logger.info("No new indicators to push to Sentinel.")
+        return
+
     logger.info("Attempting to push %d indicators to Sentinel.", len(iocs_to_create))
     failed = 0
     for counter, ioc in enumerate(iocs_to_create, start=1):

@@ -1,7 +1,11 @@
 """Sync MISP to Sentinel."""
+
 import asyncio
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
+
+from dotenv import load_dotenv
+from filelock import FileLock, Timeout
 
 from misp_to_sentinel.misp import MISPAttribute, MISPConnector
 from misp_to_sentinel.sentinel import SentinelConnector, SentinelIndicator
@@ -106,12 +110,27 @@ async def sync():
     """Sync MISP to Sentinel."""
     # Retrieve from MISP
 
-    misp_connector, sentinel_connector = __init_connectors()
-
-    existing_iocs_sentinel_external_ids, available_misp = await __get_current_state(
-        misp_connector, sentinel_connector
+    load_dotenv()
+    logging.basicConfig(
+        filename=f"logs/sync_ms_announcements_{date.today()}.log",  # noqa: DTZ011
+        format="%(asctime)s %(levelname)-10s [%(filename)s:%(lineno)d %(funcName)s] %(message)s",
+        level=logging.INFO,
     )
 
-    iocs_to_create = __compute_iocs_to_create(existing_iocs_sentinel_external_ids, available_misp)
+    try:
+        logger.info("Acquiring lock")
+        with FileLock("sync_ms_announcements.lock", timeout=1):
+            logger.info("Lock acquired")
+            misp_connector, sentinel_connector = __init_connectors()
 
-    _ = await __push_to_sentinel(sentinel_connector, iocs_to_create)
+            existing_iocs_sentinel_external_ids, available_misp = await __get_current_state(
+                misp_connector, sentinel_connector
+            )
+
+            iocs_to_create = __compute_iocs_to_create(
+                existing_iocs_sentinel_external_ids, available_misp
+            )
+
+            _ = await __push_to_sentinel(sentinel_connector, iocs_to_create)
+    except Timeout:
+        logger.warning("Couldn't acquire lock, another instance is running. Exiting.")

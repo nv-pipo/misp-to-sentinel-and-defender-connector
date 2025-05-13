@@ -96,12 +96,12 @@ def __compute_iocs_to_create(
 @timefunc_async
 async def __push_to_sentinel(
     sentinel_connector: SentinelConnector, iocs_to_create: list[SentinelIndicator]
-) -> list[dict]:
-    tasks = [sentinel_connector.create_indicator(ioc) for ioc in iocs_to_create]
+) -> None:
     logger.info("Attempting to push %d indicators to Sentinel.", len(iocs_to_create))
-    responses = await asyncio.gather(*tasks)
-    logger.info("Created %d indicators in Sentinel.", len(responses))
-    return responses
+    for counter, ioc in enumerate(iocs_to_create, start=1):
+        await sentinel_connector.create_indicator(ioc)
+        msg = f"Indicator {counter}/{len(iocs_to_create)} = {counter / len(iocs_to_create):.2%}"
+        logger.info(msg)
 
 
 @timefunc_async
@@ -117,4 +117,4 @@ async def sync():
 
     iocs_to_create = __compute_iocs_to_create(existing_iocs_sentinel_external_ids, available_misp)
 
-    _ = await __push_to_sentinel(sentinel_connector, iocs_to_create)
+    await __push_to_sentinel(sentinel_connector, iocs_to_create)

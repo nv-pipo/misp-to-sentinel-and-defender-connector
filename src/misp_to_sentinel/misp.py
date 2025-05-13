@@ -12,6 +12,8 @@ from tenacity.wait import wait_fixed
 from misp_to_sentinel.utils.environ_utils import load_env_variable
 from misp_to_sentinel.utils.timing import timefunc_async
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class MISPAttribute:
@@ -137,7 +139,7 @@ class MISPConnector:
             for attribute in response_details.json()["response"]["Attribute"]
             if (stix_id := f'indicator--{attribute["uuid"]}') in stix_partterns_per_id
         ]
-        logging.info(
+        logger.info(
             "Retrieved %s IOCs from %s (for the last %s days)",
             len(misp_attributes),
             self.misp_base_url,

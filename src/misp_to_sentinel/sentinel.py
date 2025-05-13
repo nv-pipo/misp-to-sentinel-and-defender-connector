@@ -6,6 +6,7 @@ from typing import Any
 
 import httpx
 from pydantic import BaseModel, Field
+from result import Err, Ok, Result
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
@@ -144,7 +145,7 @@ class SentinelConnector:
         logger.info("Retrieved %s indicators from Sentinel", len(data))
         return data
 
-    async def create_indicator(self, indicator: SentinelIndicator) -> None:
+    async def create_indicator(self, indicator: SentinelIndicator) -> Result[dict, str]:
         """Create an indicator in Sentinel."""
 
         url = (
@@ -164,7 +165,13 @@ class SentinelConnector:
                 "properties": indicator.model_dump(by_alias=True)
                 | {"createdByRef": "MISP_CONNECTOR"},
             },
-            timeout=10,
+            timeout=60,
         )
-        logger.info("Created IOC %s in Sentinel", repr(indicator))
-        return response.json()
+        if response.status_code != 200:
+            logger.error(
+                "Error while creating indicator (%s): %s",
+                response.status_code,
+                response.content,
+            )
+            return Err(response.content.decode())
+        return Ok(response.json())

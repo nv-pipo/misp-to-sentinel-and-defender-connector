@@ -1,0 +1,23 @@
+{
+    "cSpell.words": [
+        "authentihash",
+        "bharatbhushanaward",
+        "filelock",
+        "iocs",
+        "misp",
+        "pehash",
+        "ssdeep",
+        "stix",
+        "syncher",
+        "timefunc",
+        "tlsh",
+        "vhash",
+        "yara"
+    ],
+    // "python.testing.cwd": "src",
+    // "python.testing.pytestArgs": [
+    //     "--rootdir=app/tests"
+    // ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

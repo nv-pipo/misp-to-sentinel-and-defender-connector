@@ -1,4 +1,5 @@
 """MISP connector."""
+
 import asyncio
 import logging
 from typing import Optional
@@ -11,6 +12,8 @@ from tenacity.wait import wait_fixed
 
 from misp_to_sentinel.utils.environ_utils import load_env_variable
 from misp_to_sentinel.utils.timing import timefunc_async
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -58,7 +61,7 @@ class MISPConnector:
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     async def __request_async(self, method: str, path: str, **kwargs) -> httpx.Response:
         url = f"{self.misp_base_url}/{path}"
-        logging.debug("Requesting %s %s", method, url)
+        logger.debug("Requesting %s %s", method, url)
         response = await self.client_async.request(
             method=method,
             url=url,
@@ -66,7 +69,7 @@ class MISPConnector:
         )
 
         if response.status_code != 200:
-            logging.error(
+            logger.error(
                 "Error while requesting %s %s: %s",
                 method,
                 url,
@@ -135,9 +138,9 @@ class MISPConnector:
                 ],
             )
             for attribute in response_details.json()["response"]["Attribute"]
-            if (stix_id := f'indicator--{attribute["uuid"]}') in stix_partterns_per_id
+            if (stix_id := f"indicator--{attribute['uuid']}") in stix_partterns_per_id
         ]
-        logging.info(
+        logger.info(
             "Retrieved %s IOCs from %s (for the last %s days)",
             len(misp_attributes),
             self.misp_base_url,

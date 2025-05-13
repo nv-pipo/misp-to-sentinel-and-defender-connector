@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: main",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "misp_to_sentinel.main",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src/"
+            },
+        },
+        {
+            "name": "get_tis.py",
+            "type": "python",
+            "request": "launch",
+            "program": "src/misp_to_sentinel/manual/get_tis.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

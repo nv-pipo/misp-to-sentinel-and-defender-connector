@@ -137,7 +137,7 @@ class MISPConnector:
                 ],
             )
             for attribute in response_details.json()["response"]["Attribute"]
-            if (stix_id := f'indicator--{attribute["uuid"]}') in stix_partterns_per_id
+            if (stix_id := f"indicator--{attribute['uuid']}") in stix_partterns_per_id
         ]
         logger.info(
             "Retrieved %s IOCs from %s (for the last %s days)",

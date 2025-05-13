@@ -61,7 +61,7 @@ class MISPConnector:
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     async def __request_async(self, method: str, path: str, **kwargs) -> httpx.Response:
         url = f"{self.misp_base_url}/{path}"
-        logging.debug("Requesting %s %s", method, url)
+        logger.debug("Requesting %s %s", method, url)
         response = await self.client_async.request(
             method=method,
             url=url,
@@ -69,7 +69,7 @@ class MISPConnector:
         )
 
         if response.status_code != 200:
-            logging.error(
+            logger.error(
                 "Error while requesting %s %s: %s",
                 method,
                 url,

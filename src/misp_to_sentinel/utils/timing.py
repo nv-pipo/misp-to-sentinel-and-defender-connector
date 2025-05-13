@@ -1,8 +1,11 @@
 """Timing functions"""
+
 import asyncio
 import logging
 import time
 from functools import wraps
+
+logger = logging.getLogger(__name__)
 
 
 def timefunc_async(func):
@@ -12,14 +15,14 @@ def timefunc_async(func):
         if asyncio.iscoroutinefunction(func):
             return await func(*args, **params)
         else:
-            logging.error("this is not a coroutine")
+            logger.error("this is not a coroutine")
             return func(*args, **params)
 
     async def helper(*args, **params):
-        logging.info("Starting function %s.", func.__name__)
+        logger.info("Starting function %s.", func.__name__)
         start = time.time()
         result = await process(func, *args, **params)
-        logging.info("Function %s took %ss", func.__name__, (time.time() - start))
+        logger.info("Function %s took %ss", func.__name__, (time.time() - start))
         return result
 
     return helper
@@ -30,11 +33,11 @@ def timefunc(func):
 
     @wraps(func)
     def wrapper(*func_args, **func_kwargs):
-        logging.info("Starting function %s.", func.__name__)
+        logger.info("Starting function %s.", func.__name__)
         start = time.time()
         result = func(*func_args, **func_kwargs)
         end = time.time()
-        logging.info("Function %s took %ss", func.__name__, (end - start))
+        logger.info("Function %s took %ss", func.__name__, (end - start))
         # print('Function %s took %ss' % (func.__name__, (end-start)))
         return result
 

@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from result import Err
 
@@ -41,7 +41,7 @@ async def __get_current_state(
     sentinel_days_to_expire = int(load_env_variable("SENTINEL_DAYS_TO_EXPIRE"))
 
     sentinel_min_valid_until_utc = (
-        datetime.now(timezone.utc)
+        datetime.now(UTC)
         + timedelta(days=-look_back_days)
         + timedelta(days=sentinel_days_to_expire)
     )
@@ -80,9 +80,9 @@ def __compute_iocs_to_create(
             displayName=f"{misp_label}_attribute_{attr.attribute_id}",
             description=f"({misp_label} event_id: {attr.event_id}) {attr.event_info}",
             threatIntelligenceTags=attr.tags,
-            validFrom=datetime.fromtimestamp(attr.timestamp, timezone.utc),
+            validFrom=datetime.fromtimestamp(attr.timestamp, UTC),
             validUntil=(
-                datetime.fromtimestamp(attr.timestamp, timezone.utc)
+                datetime.fromtimestamp(attr.timestamp, UTC)
                 + timedelta(days=sentinel_days_to_expire)
             ),
             pattern=attr.pattern,

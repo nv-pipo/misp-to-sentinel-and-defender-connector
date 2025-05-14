@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-In-house script for pushing ICC MISP IOCs onto MS Sentinel. MS' tool is overly complex and buggy.
-"""
-
 import asyncio
 import logging
 from datetime import date
@@ -16,7 +10,7 @@ from misp_to_sentinel.syncher import sync
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
     """Main script/function of the whole project."""
     load_dotenv()
     logging.basicConfig(

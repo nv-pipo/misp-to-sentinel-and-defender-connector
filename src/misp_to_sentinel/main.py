@@ -1,5 +1,5 @@
 import asyncio
-import logging
+import logging.config
 
 from dotenv import load_dotenv
 from filelock import FileLock, Timeout

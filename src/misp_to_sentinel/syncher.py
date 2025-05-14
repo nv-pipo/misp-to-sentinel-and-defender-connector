@@ -109,8 +109,6 @@ async def __push_to_sentinel(
         result = await sentinel_connector.create_indicator(ioc)
         if isinstance(result, Err):
             failed += 1
-        else:
-            logger.info("Successfully pushed indicator %s to Sentinel.", ioc.external_id)
         msg = f"Indicator {counter}/{len(iocs_to_create)} = {counter / len(iocs_to_create):.2%}"
         logger.info(msg)
 

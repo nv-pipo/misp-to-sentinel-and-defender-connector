@@ -41,7 +41,7 @@ async def __get_current_state(
     sentinel_days_to_expire = int(load_env_variable("SENTINEL_DAYS_TO_EXPIRE"))
 
     sentinel_min_valid_until_utc = (
-        datetime.utcnow()
+        datetime.now(timezone.utc)
         + timedelta(days=-look_back_days)
         + timedelta(days=sentinel_days_to_expire)
     )
@@ -73,7 +73,7 @@ def __compute_iocs_to_create(
 ) -> list[SentinelIndicator]:
     misp_label = load_env_variable("MISP_LABEL")
     sentinel_days_to_expire = int(load_env_variable("SENTINEL_DAYS_TO_EXPIRE"))
-    iocs_to_create = [
+    return [
         SentinelIndicator(
             source=misp_label,
             externalId=attr.stix_id,
@@ -92,7 +92,6 @@ def __compute_iocs_to_create(
         for attr in available_misp
         if attr.stix_id not in existing_iocs_sentinel_external_ids
     ]
-    return iocs_to_create
 
 
 @timefunc_async
@@ -123,7 +122,7 @@ async def __push_to_sentinel(
 
 
 @timefunc_async
-async def sync():
+async def sync() -> None:
     """Sync MISP to Sentinel."""
     # Retrieve from MISP
 

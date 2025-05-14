@@ -40,7 +40,7 @@ def main() -> None:
 
     try:
         logger.info("Acquiring lock")
-        with FileLock("sync_ms_announcements.lock", timeout=1):
+        with FileLock("misp_to_sentinel.lock", timeout=1):
             logger.info("Lock acquired")
             logger.info("Starting")
             asyncio.run(sync())

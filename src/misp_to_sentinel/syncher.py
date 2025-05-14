@@ -7,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 from result import Err
 
 from misp_to_sentinel.misp import MISPAttribute, MISPConnector
-from misp_to_sentinel.sentinel import SentinelConnector, SentinelIndicator
+from misp_to_sentinel.sentinel import SentinelConnector, SentinelIndicator, SentinelSyncError
 from misp_to_sentinel.utils.environ_utils import load_env_variable
 from misp_to_sentinel.utils.timing import timefunc_async
 
@@ -118,6 +118,12 @@ async def __push_to_sentinel(
         len(iocs_to_create) - failed,
         failed,
     )
+    if failed > 0:
+        msg = (
+            f"Failed to push {failed} indicators to Sentinel. "
+            f"Please check the logs for more details."
+        )
+        raise SentinelSyncError(msg)
 
 
 @timefunc_async

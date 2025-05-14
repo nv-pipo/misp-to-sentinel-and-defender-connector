@@ -16,6 +16,10 @@ from misp_to_sentinel.utils.timing import timefunc_async
 logger = logging.getLogger(__name__)
 
 
+class SentinelSyncError(Exception):
+    pass
+
+
 class SentinelIndicator(BaseModel):
     """Sentinel indicator"""
 

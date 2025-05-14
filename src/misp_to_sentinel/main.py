@@ -9,15 +9,34 @@ from misp_to_sentinel.syncher import sync
 
 logger = logging.getLogger(__name__)
 
+logging_config = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "%(asctime)s %(levelname)-10s [%(name)s:%(filename)s] %(message)s"},
+    },
+    "handlers": {
+        "file": {
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "when": "midnight",
+            "formatter": "simple",
+            "filename": "logs/misp_to_sentinel.log",
+            "backupCount": 90,
+        },
+    },
+    "loggers": {
+        "root": {
+            "level": "INFO",
+            "handlers": ["file"],
+        },
+    },
+}
+
 
 def main() -> None:
     """Main script/function of the whole project."""
     load_dotenv()
-    logging.basicConfig(
-        filename=f"logs/sync_ms_announcements_{date.today()}.log",  # noqa: DTZ011
-        format="%(asctime)s %(levelname)-10s [%(filename)s:%(lineno)d %(funcName)s] %(message)s",
-        level=logging.INFO,
-    )
+    logging.config.dictConfig(logging_config)
 
     try:
         logger.info("Acquiring lock")

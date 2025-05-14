@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from result import Err
 
@@ -41,13 +41,14 @@ async def __get_current_state(
     sentinel_days_to_expire = int(load_env_variable("SENTINEL_DAYS_TO_EXPIRE"))
 
     sentinel_min_valid_until_utc = (
-        datetime.utcnow()
+        datetime.now(UTC)
         + timedelta(days=-look_back_days)
         + timedelta(days=sentinel_days_to_expire)
     )
     tasks = [
         sentinel_connector.get_indicators(
-            min_valid_until=sentinel_min_valid_until_utc.isoformat() + "Z", sources=[misp_label]
+            min_valid_until=sentinel_min_valid_until_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            sources=[misp_label],
         ),
         misp_connector.get_attributes_with_stix2_patterns(
             look_back_days=load_env_variable("LOOK_BACK_DAYS"),
@@ -73,16 +74,16 @@ def __compute_iocs_to_create(
 ) -> list[SentinelIndicator]:
     misp_label = load_env_variable("MISP_LABEL")
     sentinel_days_to_expire = int(load_env_variable("SENTINEL_DAYS_TO_EXPIRE"))
-    iocs_to_create = [
+    return [
         SentinelIndicator(
             source=misp_label,
             externalId=attr.stix_id,
             displayName=f"{misp_label}_attribute_{attr.attribute_id}",
             description=f"({misp_label} event_id: {attr.event_id}) {attr.event_info}",
             threatIntelligenceTags=attr.tags,
-            validFrom=datetime.fromtimestamp(attr.timestamp, timezone.utc),
+            validFrom=datetime.fromtimestamp(attr.timestamp, UTC),
             validUntil=(
-                datetime.fromtimestamp(attr.timestamp, timezone.utc)
+                datetime.fromtimestamp(attr.timestamp, UTC)
                 + timedelta(days=sentinel_days_to_expire)
             ),
             pattern=attr.pattern,
@@ -92,7 +93,6 @@ def __compute_iocs_to_create(
         for attr in available_misp
         if attr.stix_id not in existing_iocs_sentinel_external_ids
     ]
-    return iocs_to_create
 
 
 @timefunc_async
@@ -123,7 +123,7 @@ async def __push_to_sentinel(
 
 
 @timefunc_async
-async def sync():
+async def sync() -> None:
     """Sync MISP to Sentinel."""
     # Retrieve from MISP
 

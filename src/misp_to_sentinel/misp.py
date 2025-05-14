@@ -1,8 +1,7 @@
-"""MISP connector."""
+# ruff: noqa: ANN003
 
 import asyncio
 import logging
-from typing import Optional
 
 import httpx
 from pydantic.dataclasses import dataclass
@@ -30,7 +29,7 @@ class MISPAttribute:
     tags: list[str]
 
 
-class MISPConnectorRetrieveException(Exception):
+class MISPConnectorRetrieveError(Exception):
     """Exception raised when MISP connector fails to retrieve data."""
 
 
@@ -68,26 +67,25 @@ class MISPConnector:
             **kwargs,
         )
 
-        if response.status_code != 200:
+        if response.status_code != httpx.codes.OK:
             logger.error(
                 "Error while requesting %s %s: %s",
                 method,
                 url,
                 response.content,
             )
-            raise MISPConnectorRetrieveException()
+            raise MISPConnectorRetrieveError
 
         return response
 
     @timefunc_async
     async def get_attributes_with_stix2_patterns(
-        self, look_back_days: int, ioc_types: Optional[list[str]] = None
+        self, look_back_days: int, ioc_types: list[str] | None = None
     ) -> list[MISPAttribute]:
         """Search for attributes (IOCs) in MISP."""
         data = {
             "timestamp": f"{look_back_days}d",
             "published": True,
-            # "limit": 5,
         }
         if ioc_types:
             data["type"] = ioc_types

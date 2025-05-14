@@ -5,6 +5,7 @@
         "filelock",
         "iocs",
         "misp",
+        "partterns",
         "pehash",
         "ssdeep",
         "stix",

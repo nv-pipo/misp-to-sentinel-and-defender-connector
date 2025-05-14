@@ -1,4 +1,4 @@
-"""Sentinel API class"""
+# ruff: noqa: ANN003
 
 import logging
 import re
@@ -36,14 +36,14 @@ class SentinelIndicator(BaseModel):
         super().__init__(**data)
 
 
-class SentinelConnectorRetrieveException(Exception):
+class SentinelConnectorRetrieveError(Exception):
     """Exception raised when Sentinel connector fails to retrieve data."""
 
 
 class SentinelConnector:
     """Sentinel connector"""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         tenant_id: str,
         client_id: str,
@@ -85,7 +85,7 @@ class SentinelConnector:
             **kwargs,
         )
 
-        if response.status_code != 200:
+        if response.status_code != httpx.codes.OK:
             logger.error(
                 "Error while requesting (%s) %s %s: %s",
                 response.status_code,
@@ -93,7 +93,7 @@ class SentinelConnector:
                 url,
                 response.content,
             )
-            raise SentinelConnectorRetrieveException()
+            raise SentinelConnectorRetrieveError
 
         return response
 
@@ -113,7 +113,7 @@ class SentinelConnector:
                     if (match := re.match(r"(?P<key>.*?)=(?P<value>.*)", param))
                 }
                 skip_token = split_params["$skipToken"]
-                kwargs["json"] = dict(skipToken=skip_token)
+                kwargs["json"] = {"skipToken": skip_token}
             else:
                 url = next_link
 
@@ -121,8 +121,6 @@ class SentinelConnector:
 
     @timefunc_async
     async def get_indicators(self, min_valid_until: str, sources: list[str]) -> list[str]:
-        """Retrieve all indicators from Sentinel."""
-
         url = (
             f"https://management.azure.com"
             f"/subscriptions/{self.subscription_id}"
@@ -146,8 +144,6 @@ class SentinelConnector:
         return data
 
     async def create_indicator(self, indicator: SentinelIndicator) -> Result[dict, str]:
-        """Create an indicator in Sentinel."""
-
         url = (
             f"https://management.azure.com/subscriptions/{self.subscription_id}"
             f"/resourceGroups/{self.resource_group_name}"
@@ -167,7 +163,7 @@ class SentinelConnector:
             },
             timeout=60,
         )
-        if response.status_code != 200:
+        if response.status_code != httpx.codes.OK:
             logger.error(
                 "Error while creating indicator (%s): %s",
                 response.status_code,

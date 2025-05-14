@@ -47,7 +47,8 @@ async def __get_current_state(
     )
     tasks = [
         sentinel_connector.get_indicators(
-            min_valid_until=sentinel_min_valid_until_utc.isoformat() + "Z", sources=[misp_label]
+            min_valid_until=sentinel_min_valid_until_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            sources=[misp_label],
         ),
         misp_connector.get_attributes_with_stix2_patterns(
             look_back_days=load_env_variable("LOOK_BACK_DAYS"),

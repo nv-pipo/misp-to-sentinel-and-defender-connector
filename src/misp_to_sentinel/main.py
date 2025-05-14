@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from datetime import date
 
 from dotenv import load_dotenv
 from filelock import FileLock, Timeout

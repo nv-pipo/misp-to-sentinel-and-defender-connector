@@ -59,7 +59,7 @@ class MISPConnector:
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     async def __request_async(self, method: str, path: str, **kwargs) -> httpx.Response:
-        url = f"{self.misp_base_url}/{path}"
+        url = f"{self.misp_base_url.rstrip('/')}/{path.lstrip('/')}"
         logger.debug("Requesting %s %s", method, url)
         response = await self.client_async.request(
             method=method,

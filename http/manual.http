@@ -1,0 +1,14 @@
+###
+GET https://commonsecure.unicc.org/servers/getVersion
+Authorization: {{$dotenv MISP_KEY}}
+Accept: application/json
+
+###
+GET https://commonsecure.unicc.org/attributes/restSearch
+Authorization: {{$dotenv MISP_KEY}}
+Accept: application/json
+
+{
+    "timestamp": "1d"
+}
+###

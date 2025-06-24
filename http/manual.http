@@ -1,0 +1,24 @@
+###
+GET {{$dotenv MISP_BASE_URL}}/servers/getVersion
+Authorization: {{$dotenv MISP_KEY}}
+Accept: application/json
+
+###
+GET {{$dotenv MISP_BASE_URL}}/attributes/restSearch
+Authorization: {{$dotenv MISP_KEY}}
+Accept: application/json
+
+{
+    "timestamp": "1d"
+}
+###
+GET {{$dotenv MISP_BASE_URL}}/attributes/restSearch
+Authorization: {{$dotenv MISP_KEY}}
+Accept: application/json
+
+{
+    "timestamp": "1d",
+    "published": true,
+    "returnFormat": "stix2"
+}
+###

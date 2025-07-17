@@ -22,3 +22,22 @@ Accept: application/json
     "returnFormat": "stix2"
 }
 ###
+GET {{$dotenv MISP_BASE_URL}}/attributes/restSearch
+Authorization: {{$dotenv MISP_KEY}}
+Accept: application/json
+
+{
+    "limit": "1",
+    "returnFormat": "json"
+}
+###
+POST {{$dotenv MISP_BASE_URL}}/events/restSearch
+Authorization: {{$dotenv MISP_KEY}}
+Accept: application/json
+
+{
+  "limit": "2",
+  "published": true,
+  "returnFormat": "stix2"
+}
+###

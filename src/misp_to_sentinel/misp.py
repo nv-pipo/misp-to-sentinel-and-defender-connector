@@ -91,22 +91,18 @@ class MISPConnector:
             data["type"] = ioc_types
 
         # Retrieve attributes from MISP as JSON and STIX2 to return all required data
-        tasks = [
-            self.__request_async(
-                method="POST",
-                path="/attributes/restSearch",
-                json=data | {"includeEventTags": True},
-                timeout=120,
-            ),
-            self.__request_async(
-                method="POST",
-                path="/attributes/restSearch",
-                json=data | {"returnFormat": "stix2"},
-                timeout=120,
-            ),
-        ]
-
-        response_details, response_stix = await asyncio.gather(*tasks)
+        response_details = await self.__request_async(
+            method="POST",
+            path="/attributes/restSearch",
+            json=data | {"includeEventTags": True},
+            timeout=120,
+        )
+        response_stix = await self.__request_async(
+            method="POST",
+            path="/attributes/restSearch",
+            json=data | {"returnFormat": "stix2"},
+            timeout=120,
+        )
 
         stix_partterns_per_id = {
             o["id"]: o["pattern"]
